@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BBQ Plus – BBQ by the Weight, Sham Nagar Road, Lahore</title>
+<meta name="description" content="BBQ Plus, Sham Nagar Road, Lahore. Pioneers of selling BBQ by weight since 2002. Malai Boti, Thai Tikka, Drumsticks and more. Open 7 days, 5 PM to 2 AM.">
+<meta name="theme-color" content="#161412">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header class="site-header" id="top">
+  <a class="brand" href="#top">BBQ <span>Plus</span></a>
+  <nav class="nav" aria-label="Main">
+    <a href="#story">Story</a>
+    <a href="#spotlight">Signature</a>
+    <a href="#scale">Scale</a>
+    <a href="#order">Menu</a>
+    <a href="#visit">Visit</a>
+  </nav>
+  <a class="btn btn-small" href="#order">Order</a>
+</header>
+
+<main>
+<!-- ============ HERO ============ -->
+<section class="hero" id="hero">
+  <div class="hero-bg"><img src="images/hero.jpg" alt="Charcoal grilled BBQ at BBQ Plus"></div>
+  <canvas class="sparks" id="sparks" aria-hidden="true"></canvas>
+  <div class="hero-content">
+    <p class="status-wrap"><span class="status" data-status><i></i><b>Checking…</b></span></p>
+    <p class="eyebrow">Sham Nagar Road · Lahore</p>
+    <h1 id="heroTitle">Lahore's original BBQ, <em>sold by the weight.</em></h1>
+    <p class="hero-sub">Charcoal grilled, weighed in front of you, served hot. Open every day, 5 PM to 2 AM.</p>
+    <div class="hero-actions">
+      <a class="btn" href="#order">Build your order</a>
+      <a class="btn btn-ghost" href="#spotlight">See the Malai Boti</a>
+    </div>
+  </div>
+  <a class="scroll-hint" href="#story" aria-label="Scroll down"><span></span></a>
+</section>
+
+<!-- ============ STRIP 1 ============ -->
+<div class="strip" aria-hidden="true">
+  <div class="strip-track">
+    <span>Malai Boti</span><span>Chicken Thai Tikka</span><span>Drumstick</span><span>Nablets</span><span>Chicken Kabab</span><span>Grilled Fish</span>
+    <span>Malai Boti</span><span>Chicken Thai Tikka</span><span>Drumstick</span><span>Nablets</span><span>Chicken Kabab</span><span>Grilled Fish</span>
+  </div>
+</div>
+
+<!-- ============ STORY ============ -->
+<section class="section story" id="story">
+  <div class="wrap story-grid">
+    <div class="story-photo" data-anim="left">
+      <div class="zoom"><img src="images/story.jpg" alt="Fresh BBQ on the grill" loading="lazy"></div>
+    </div>
+    <div class="story-text">
+      <p class="eyebrow dark" data-anim="right">Our story</p>
+      <div class="since" data-anim="up">
+        <span class="since-label">Since</span>
+        <span class="since-num" id="sinceNum" data-from="1990" data-to="2002">2002</span>
+      </div>
+      <h2 data-anim="right">The first in Lahore to sell BBQ <em>by weight.</em></h2>
+      <p data-anim="up">In 2002, BBQ Plus started on Sham Nagar Road with a simple idea: you should pay for exactly the BBQ you want. No fixed plates, no guessing. Ask for a pao, half a kg or a full kilo, and we weigh it fresh.</p>
+      <p data-anim="up">More than twenty years later the charcoal is still lit every evening, and Malai Boti is still the reason people line up.</p>
+      <ul class="facts" data-anim="up">
+        <li><b>2002</b><span>First grill lit</span></li>
+        <li><b>By weight</b><span>Pioneers in Lahore</span></li>
+        <li><b>7 days</b><span>5 PM – 2 AM</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SPOTLIGHT ============ -->
+<section class="spotlight" id="spotlight">
+  <div class="spot-pin">
+    <header class="spot-head">
+      <p class="eyebrow">Signature dishes</p>
+      <h2>From the coals, <em>to the plate.</em></h2>
+    </header>
+    <div class="spot-stage">
+
+      <article class="spot big" data-spot>
+        <div class="plate-wrap">
+          <canvas class="smoke" aria-hidden="true"></canvas>
+          <div class="plate"><img src="images/malai-boti.jpg" alt="Malai Boti on a plate"></div>
+        </div>
+        <div class="spot-text">
+          <span class="tag">Signature · Most famous</span>
+          <h3>Malai Boti</h3>
+          <p>Soft, creamy, tender boti grilled over charcoal. The one dish everybody comes back for.</p>
+          <p class="price" data-price="malai"></p>
+          <a class="btn" href="#order">Order Malai Boti</a>
+        </div>
+      </article>
+
+      <article class="spot" data-spot>
+        <div class="plate-wrap">
+          <canvas class="smoke" aria-hidden="true"></canvas>
+          <div class="plate"><img src="images/drumstick.jpg" alt="Chicken drumsticks" loading="lazy"></div>
+        </div>
+        <div class="spot-text">
+          <span class="tag">Charcoal favourite</span>
+          <h3>Chicken Drumstick</h3>
+          <p>Juicy drumsticks, marinated well and grilled until the outside is crisp and smoky.</p>
+          <p class="price" data-price="drumstick"></p>
+          <a class="btn" href="#order">Order Drumstick</a>
+        </div>
+      </article>
+
+      <article class="spot" data-spot>
+        <div class="plate-wrap">
+          <canvas class="smoke" aria-hidden="true"></canvas>
+          <div class="plate"><img src="images/nablets.jpg" alt="Nablets" loading="lazy"></div>
+        </div>
+        <div class="spot-text">
+          <span class="tag">Fan favourite</span>
+          <h3>Nablets</h3>
+          <p>Small, tasty bites that disappear fast. Perfect to share, weighed by the pao.</p>
+          <p class="price" data-price="nablets"></p>
+          <a class="btn" href="#order">Order Nablets</a>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ OTHER DISHES ============ -->
+<section class="section dark-soft" id="dishes">
+  <div class="wrap">
+    <p class="eyebrow" data-anim="right">More from the grill</p>
+    <h2 class="section-title" data-anim="right">Also on the <em>coals</em></h2>
+    <div class="cards">
+      <article class="card" data-anim="up">
+        <div class="zoom"><img src="images/chicken-tikka.jpg" alt="Chicken Thai Tikka" loading="lazy"></div>
+        <div class="card-body">
+          <h3>Chicken Thai Tikka</h3>
+          <p class="muted">Thigh pieces, full of flavour.</p>
+          <p class="price small" data-price="tikka"></p>
+        </div>
+      </article>
+      <article class="card" data-anim="up">
+        <div class="zoom"><img src="images/chicken-kabab.jpg" alt="Chicken Kabab" loading="lazy"></div>
+        <div class="card-body">
+          <h3>Chicken Kabab</h3>
+          <p class="muted">Soft, spiced and smoky.</p>
+          <p class="price small" data-price="kabab"></p>
+        </div>
+      </article>
+      <article class="card" data-anim="up">
+        <div class="zoom"><img src="images/grill-fish.jpg" alt="Grilled fish" loading="lazy"></div>
+        <div class="card-body">
+          <h3>Grilled Fish <span class="chip">Winter only</span></h3>
+          <p class="muted">Seasonal. Available in the winter months.</p>
+          <p class="price small" data-price="fish"></p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WEIGHING SCALE ============ -->
+<section class="section scale-sec" id="scale">
+  <div class="wrap">
+    <p class="eyebrow dark" data-anim="right">Sold by weight</p>
+    <h2 class="section-title dark" data-anim="right">Try the <em>scale</em></h2>
+    <p class="lead" data-anim="up">Pick a dish and a weight. 1 pao is 250 g. Watch the needle and see the price.</p>
+
+    <div class="scale-box" data-anim="up">
+      <div class="scale-controls">
+        <label for="scaleDish">Dish</label>
+        <select id="scaleDish"></select>
+
+        <span class="label">Weight</span>
+        <div class="seg" id="scaleWeights" role="group" aria-label="Weight">
+          <button type="button" data-w="250" class="on">1 pao</button>
+          <button type="button" data-w="500">Half kg</button>
+          <button type="button" data-w="1000">1 kg</button>
+        </div>
+
+        <div class="scale-read" aria-live="polite">
+          <div><small>Weight</small><b id="scaleGrams">0 g</b></div>
+          <div><small>Price</small><b id="scalePrice" class="ember">Rs 0</b></div>
+        </div>
+      </div>
+
+      <div class="dial-wrap">
+        <svg class="dial" viewBox="0 0 400 240" role="img" aria-label="Weighing scale dial">
+          <defs>
+            <linearGradient id="arcG" x1="0" x2="1">
+              <stop offset="0" stop-color="#ffc46b"/><stop offset="1" stop-color="#ff6a1a"/>
+            </linearGradient>
+          </defs>
+          <path d="M40 200 A160 160 0 0 1 360 200" fill="none" stroke="#3a322b" stroke-width="22" stroke-linecap="round"/>
+          <path d="M40 200 A160 160 0 0 1 360 200" fill="none" stroke="url(#arcG)" stroke-width="6" stroke-linecap="round"/>
+          <g id="ticks"></g>
+          <g id="needle">
+            <line x1="200" y1="200" x2="200" y2="62" stroke="#f6ecd9" stroke-width="5" stroke-linecap="round"/>
+            <polygon points="200,54 193,76 207,76" fill="#ff6a1a"/>
+          </g>
+          <circle cx="200" cy="200" r="16" fill="#ff6a1a"/>
+          <circle cx="200" cy="200" r="6" fill="#161412"/>
+        </svg>
+        <div class="dial-dish"><img id="scaleImg" src="images/malai-boti.jpg" alt=""></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STRIP 2 ============ -->
+<div class="strip strip-rev" aria-hidden="true">
+  <div class="strip-track">
+    <span>By the pao</span><span>Half kg</span><span>Full kg</span><span>Since 2002</span><span>Sham Nagar Road</span><span>5 PM – 2 AM</span>
+    <span>By the pao</span><span>Half kg</span><span>Full kg</span><span>Since 2002</span><span>Sham Nagar Road</span><span>5 PM – 2 AM</span>
+  </div>
+</div>
+
+<!-- ============ MENU + ORDER ============ -->
+<section class="section menu-sec" id="order">
+  <div class="wrap">
+    <p class="eyebrow" data-anim="right">Menu &amp; order</p>
+    <h2 class="section-title" data-anim="right">Build your <em>order</em></h2>
+    <p class="lead light" data-anim="up">Choose the weight, add to your order, and send it to us on WhatsApp.</p>
+
+    <div class="order-grid">
+      <div class="menu-list" id="menuList"></div>
+
+      <aside class="order-box" aria-labelledby="orderTitle">
+        <h3 id="orderTitle">Your order</h3>
+        <p class="empty" id="orderEmpty">Nothing yet. Add a dish from the menu.</p>
+        <ul class="order-items" id="orderItems"></ul>
+        <div class="total"><span>Total</span><b id="orderTotal">Rs 0</b></div>
+
+        <fieldset class="mode">
+          <legend>How will you get it?</legend>
+          <label><input type="radio" name="mode" value="Pickup" checked> Pickup</label>
+          <label><input type="radio" name="mode" value="Delivery"> Delivery</label>
+        </fieldset>
+
+        <label class="field" for="custName">Your name</label>
+        <input id="custName" type="text" autocomplete="name" placeholder="e.g. Ali">
+
+        <div id="addrWrap" hidden>
+          <label class="field" for="custAddr">Delivery address</label>
+          <textarea id="custAddr" rows="2" autocomplete="street-address" placeholder="House, street, area"></textarea>
+        </div>
+
+        <p class="msg" id="orderMsg" role="alert"></p>
+        <button type="button" class="btn wa-btn" id="sendOrder">
+          <svg viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M16 3C9 3 3.4 8.6 3.4 15.5c0 2.3.6 4.4 1.7 6.3L3 29l7.4-2c1.8 1 3.800 1.500 5.600 1.500 7 0 12.600-5.600 12.600-12.500S23 3 16 3zm6.200 17.600c-.3.800-1.500 1.500-2.100 1.600-.5.100-1.200.100-1.900-.1-.4-.1-1-.3-1.700-.6-3-1.300-5-4.300-5.100-4.500-.2-.2-1.300-1.700-1.300-3.200s.8-2.300 1.100-2.600c.3-.3.600-.4.800-.4h.600c.2 0 .5-.1.700.5l1 2.400c.1.200.1.400 0 .600l-.4.600-.5.600c-.2.200-.3.400-.1.700.2.300.8 1.300 1.700 2.100 1.200 1 2.200 1.400 2.500 1.500.3.200.5.100.7-.1l1-1.200c.2-.3.400-.2.700-.1l2.200 1.100c.3.100.5.200.6.300.1.200.1.800-.2 1.600z"/></svg>
+          Send order on WhatsApp
+        </button>
+        <p class="tiny">This opens WhatsApp with your order already written. Nothing is sent until you press send there.</p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ VISIT ============ -->
+<section class="section visit" id="visit">
+  <div class="wrap visit-grid">
+    <div class="visit-info">
+      <p class="eyebrow dark" data-anim="right">Visit us</p>
+      <h2 class="section-title dark" data-anim="right">Come hungry.</h2>
+      <p class="status-wrap" data-anim="up"><span class="status" data-status><i></i><b>Checking…</b></span></p>
+      <dl class="info" data-anim="up">
+        <div><dt>Address</dt><dd>BBQ Plus, Sham Nagar Road, Lahore, Pakistan</dd></div>
+        <div><dt>Hours</dt><dd>Every day, 5 PM to 2 AM</dd></div>
+        <div><dt>Phone</dt><dd><a href="tel:03000000000">0300 0000000</a></dd></div>
+      </dl>
+      <div class="hero-actions" data-anim="up">
+        <a class="btn" href="https://www.google.com/maps/search/?api=1&query=Sham+Nagar+Road+Lahore" target="_blank" rel="noopener">Get directions</a>
+        <a class="btn btn-outline" href="tel:03000000000">Call us</a>
+      </div>
+    </div>
+    <div class="map" data-anim="left">
+      <iframe title="Map of Sham Nagar Road, Lahore" src="https://www.google.com/maps?q=Sham+Nagar+Road,+Lahore&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="wrap">
+    <p class="brand big">BBQ <span>Plus</span></p>
+    <p>Sham Nagar Road, Lahore · Since 2002 · 5 PM – 2 AM, 7 days</p>
+    <p class="demo">This is a demo website. The phone number and orders are placeholders.</p>
+    <p class="tiny">Photos from <a href="https://www.pexels.com" target="_blank" rel="noopener">Pexels</a>.</p>
+  </div>
+</footer>
+
+<!-- Floating WhatsApp -->
+<a class="wa-float" id="waFloat" href="#" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+  <svg viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M16 3C9 3 3.4 8.6 3.4 15.5c0 2.3.6 4.4 1.7 6.3L3 29l7.4-2c1.8 1 3.800 1.500 5.600 1.500 7 0 12.600-5.600 12.600-12.500S23 3 16 3zm6.200 17.600c-.3.800-1.500 1.500-2.100 1.600-.5.100-1.200.100-1.900-.1-.4-.1-1-.3-1.700-.6-3-1.300-5-4.300-5.100-4.500-.2-.2-1.300-1.700-1.300-3.200s.8-2.300 1.100-2.600c.3-.3.600-.4.800-.4h.600c.2 0 .5-.1.700.5l1 2.400c.1.200.1.400 0 .600l-.4.600-.5.600c-.2.200-.3.400-.1.700.2.300.8 1.300 1.700 2.100 1.200 1 2.200 1.400 2.500 1.500.3.200.5.100.7-.1l1-1.200c.2-.3.400-.2.700-.1l2.200 1.100c.3.100.5.200.6.300.1.200.1.800-.2 1.600z"/></svg>
+  <span>Order on WhatsApp</span>
+</a>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
