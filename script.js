@@ -165,12 +165,19 @@
       let phoneSize = isPhone();   // phones get slightly lighter smoke
       const puffs = [];
       let timer = 0;
+      // On a computer with a mouse, hovering the card makes its smoke a bit stronger (eased in and out).
+      let boost = 0, boostTo = 0;
+      if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+        spot.addEventListener('mouseenter', () => { boostTo = 1; });
+        spot.addEventListener('mouseleave', () => { boostTo = 0; });
+      }
       window.addEventListener('resize', () => { size = fitCanvas(canvas); phoneSize = isPhone(); });
 
       runWhileVisible(canvas, dt => {
+        boost += (boostTo - boost) * Math.min(1, dt * 5);
         timer -= dt;
         if (timer <= 0) {
-          timer = phoneSize ? 0.5 : 0.35;
+          timer = (phoneSize ? 0.5 : 0.35) * (1 - boost * 0.3);
           const max = 5 + Math.random() * 2;
           puffs.push({
             x: size.w * (0.5 + (Math.random() - 0.5) * 0.28),
@@ -194,7 +201,7 @@
           const x = p.x + Math.sin(p.life * 0.9 + p.phase) * p.sway * (0.4 + t);
           // fade in, rise, melt away; and fade early if a wisp ever got near an edge
           const edge = clamp01(Math.min(p.y - ry, x - r, size.w - x - r) / (size.h * 0.12));
-          ctx.globalAlpha = Math.sin(Math.PI * t) * (phoneSize ? 0.16 : 0.2) * edge;
+          ctx.globalAlpha = Math.sin(Math.PI * t) * (phoneSize ? 0.16 : 0.2) * (1 + boost * 0.5) * edge;
           ctx.drawImage(puff, x - r, p.y - ry, r * 2, ry * 2);
         }
         ctx.globalAlpha = 1;
@@ -228,8 +235,10 @@
       .from('.hero .status-wrap, .hero .eyebrow', { y: 16, opacity: 0, duration: .7, stagger: .1 })
       .from('#heroTitle .word', { y: phone ? 28 : 50, opacity: 0, duration: .9, stagger: .13 }, '-=.3')
       .from('.hero-sub, .hero .hero-actions', { y: 20, opacity: 0, duration: .8, stagger: .15 }, '-=.4');
+    // The hero photo also drifts down a little (slower than the page) on bigger screens.
+    // The zoom is big enough that this never shows an empty edge.
     gsap.to('.hero-bg img', {
-      scale: 1.16, ease: 'none',
+      scale: 1.16, yPercent: phone ? 0 : 7, ease: 'none',
       scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true }
     });
 
@@ -244,6 +253,17 @@
       gsap.from(el, { ...from, scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
     };
     $$('[data-anim]').forEach(slideIn);
+
+    /* Our Story photo: moves slightly slower than the page. Not on phones. */
+    gsap.matchMedia().add('(min-width: 768px)', () => {
+      const photo = $('.story-photo');
+      photo.classList.add('parallax');   // makes the photo a little taller than its frame
+      gsap.fromTo($('.zoom img', photo), { '--py': '-8%' }, {
+        '--py': '8%', ease: 'none',
+        scrollTrigger: { trigger: photo, start: 'top bottom', end: 'bottom top', scrub: true }
+      });
+      return () => photo.classList.remove('parallax');
+    });
 
     /* "Since 2002": counts up from 1990 and glows once */
     const since = $('#sinceNum');
@@ -396,7 +416,46 @@
   const emptyEl = $('#orderEmpty');
   const msgEl = $('#orderMsg');
 
-  function renderCart() {
+  // The total counts up (or down) to the new amount. `delay` lets it wait for the flying photo.
+  const shownTotal = { v: 0 };
+  function showTotal(total, delay = 0) {
+    if (!animate) { totalEl.textContent = money(total); return; }
+    gsap.to(shownTotal, {
+      v: total, duration: .6, delay, ease: 'power2.out', overwrite: true,
+      onUpdate: () => { totalEl.textContent = money(Math.round(shownTotal.v)); },
+      onComplete: () => { totalEl.textContent = money(total); }
+    });
+  }
+
+  // A small copy of the dish photo flies from the menu card into the order box.
+  // It is fixed on top of the page and ignores the mouse, so scrolling is never affected.
+  function flyToOrder(fromImg, done) {
+    const target = $('#orderTitle').getBoundingClientRect();
+    const from = fromImg.getBoundingClientRect();
+    const fly = new Image();
+    fly.src = fromImg.currentSrc || fromImg.src;
+    fly.alt = '';
+    Object.assign(fly.style, {
+      position: 'fixed', left: from.left + 'px', top: from.top + 'px',
+      width: from.width + 'px', height: from.height + 'px', objectFit: 'cover',
+      borderRadius: '50%', zIndex: 70, pointerEvents: 'none', willChange: 'transform'
+    });
+    document.body.appendChild(fly);
+    // If the order box is off screen (phones), fly towards the nearest screen edge instead.
+    const tx = Math.min(Math.max(target.left + 40, 20), innerWidth - 20) - (from.left + from.width / 2);
+    const ty = Math.min(Math.max(target.top + 20, 20), innerHeight - 20) - (from.top + from.height / 2);
+    const time = .7;
+    // x and y use different easing, which bends the path into a little arc
+    gsap.to(fly, { x: tx, duration: time, ease: 'power1.inOut' });
+    gsap.to(fly, { y: ty, duration: time, ease: 'power2.in' });
+    gsap.to(fly, {
+      scale: .3, opacity: .4, duration: time, ease: 'power1.in',
+      onComplete: () => { fly.remove(); done(); }
+    });
+    return time;
+  }
+
+  function renderCart(delay = 0) {
     let total = 0;
     itemsEl.innerHTML = cart.map((it, i) => {
       const d = dishById(it.id);
@@ -412,7 +471,7 @@
         </div>
       </li>`;
     }).join('');
-    totalEl.textContent = money(total);
+    showTotal(total, delay);
     emptyEl.hidden = cart.length > 0;
     return total;
   }
@@ -424,7 +483,9 @@
     const g = +$(`[data-weight="${id}"]`, menuList).value;
     const found = cart.find(it => it.id === id && it.g === g);
     if (found) found.qty++; else cart.push({ id, g, qty: 1 });
-    renderCart();
+    // With animations on, the total waits until the photo has landed in the order box.
+    renderCart(animate ? .7 : 0);
+    if (animate) flyToOrder($('.thumb img', btn.closest('.menu-item')), () => {});
     msgEl.textContent = '';
     btn.textContent = 'Added ✓'; btn.classList.add('done');
     setTimeout(() => { btn.textContent = 'Add'; btn.classList.remove('done'); }, 900);
