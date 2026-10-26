@@ -1,8 +1,9 @@
 /* BBQ Plus – all the behaviour of the page.
    Order of this file:
-   1. settings + dish list      4. open/closed badge     7. scale
-   2. small helpers             5. sparks + smoke        8. order builder
-   3. price text                6. scroll animations     9. WhatsApp float
+   1. settings + dish list      5. sparks + smoke        9. WhatsApp float
+   2. small helpers             6. scroll animations    10. phone menu
+   3. price text                7. scale                11. menu links + start position
+   4. open/closed badge         8. order builder
 */
 (() => {
   'use strict';
@@ -13,14 +14,16 @@
   const CLOSE_HOUR = 2;               // 2 AM (next day)
 
   // Only the price per kg is stored. Every other weight is worked out from it.
-  // basis = the weight we show first on the menu.
+  // basis = the weight we show first on the menu (and on the scale).
+  // weights = only these weights are sold (leave out to sell every weight).
+  // w, h = size of the photo file, so the page knows its shape before it loads.
   const DISHES = [
-    { id: 'malai',     name: 'Malai Boti',         perKg: 1400, basis: 250,  img: 'malai-boti.jpg' },
-    { id: 'tikka',     name: 'Chicken Thai Tikka', perKg: 1000, basis: 500,  img: 'chicken-tikka.jpg' },
-    { id: 'drumstick', name: 'Chicken Drumstick',  perKg: 1000, basis: 500,  img: 'drumstick.jpg' },
-    { id: 'nablets',   name: 'Nablets',            perKg: 1400, basis: 250,  img: 'nablets.jpg' },
-    { id: 'kabab',     name: 'Chicken Kabab',      perKg: 1400, basis: 250,  img: 'chicken-kabab.jpg' },
-    { id: 'fish',      name: 'Grilled Fish (winter)', perKg: 1600, basis: 1000, img: 'grill-fish.jpg' }
+    { id: 'malai',     name: 'Malai Boti',         perKg: 1400, basis: 250,  img: 'malai-boti.jpg', w: 1400, h: 1050 },
+    { id: 'tikka',     name: 'Chicken Thai Tikka', perKg: 1000, basis: 500,  img: 'chicken-tikka.jpg', w: 1400, h: 933 },
+    { id: 'drumstick', name: 'Chicken Drumstick',  perKg: 1000, basis: 500,  img: 'drumstick.jpg', w: 1400, h: 933 },
+    { id: 'nablets',   name: 'Nablets',            perKg: 1400, basis: 250,  img: 'nablets.jpg', w: 1400, h: 933 },
+    { id: 'kabab',     name: 'Chicken Kabab',      perKg: 1400, basis: 250,  img: 'chicken-kabab.jpg', w: 1400, h: 933 },
+    { id: 'fish',      name: 'Grilled Fish (winter)', perKg: 1600, basis: 1000, img: 'grill-fish.jpg', w: 1400, h: 933, weights: [500, 1000] }
   ];
   const WEIGHTS = [
     { g: 250,  short: '1 pao',   long: '1 pao (250 g)' },
@@ -36,6 +39,8 @@
   const priceFor = (dish, grams) => Math.round(dish.perKg * grams / 1000);
   const dishById = id => DISHES.find(d => d.id === id);
   const weightByG = g => WEIGHTS.find(w => w.g === g);
+  const weightsFor = dish => WEIGHTS.filter(w => !dish.weights || dish.weights.includes(w.g));
+  const gramsText = g => g < 1000 ? g + ' g' : (g / 1000) + ' kg';
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isPhone = () => window.matchMedia('(max-width: 767px)').matches;
@@ -153,20 +158,21 @@
       const canvas = $('.smoke', spot);
       const ctx = canvas.getContext('2d');
       let size = fitCanvas(canvas);
+      let phoneSize = isPhone();   // phones keep the lighter smoke; desktop gets a bit more
       const puffs = [];
       let timer = 0;
-      window.addEventListener('resize', () => { size = fitCanvas(canvas); });
+      window.addEventListener('resize', () => { size = fitCanvas(canvas); phoneSize = isPhone(); });
 
       runWhileVisible(canvas, dt => {
         // In the pinned layout, only the dish at the front makes smoke.
         const front = !spot.closest('.pinned') || gsap.getProperty(spot, 'opacity') > 0.3;
         timer -= dt;
         if (front && timer <= 0) {
-          timer = isPhone() ? 0.55 : 0.28;
+          timer = phoneSize ? 0.55 : 0.22;
           puffs.push({
             x: size.w * (0.5 + (Math.random() - 0.5) * 0.3),
             y: size.h * 0.98,
-            r: size.w * (0.07 + Math.random() * 0.05),
+            r: size.w * (phoneSize ? 0.07 + Math.random() * 0.05 : 0.08 + Math.random() * 0.06),
             vy: size.h * (0.12 + Math.random() * 0.08),
             grow: 1.1 + Math.random() * 0.7,
             sway: size.w * (0.02 + Math.random() * 0.04),
@@ -184,7 +190,7 @@
           p.y -= p.vy * dt;
           const r = p.r * (1 + t * 2.4 * p.grow);
           const x = p.x + Math.sin(p.life * 0.9 + p.phase) * p.sway * (0.4 + t);
-          ctx.globalAlpha = Math.sin(Math.PI * t) * 0.24;   // see-through: rises, then melts away
+          ctx.globalAlpha = Math.sin(Math.PI * t) * (phoneSize ? 0.24 : 0.36);   // see-through: rises, then melts away
           ctx.drawImage(puff, x - r, p.y - r, r * 2, r * 2);
         }
         ctx.globalAlpha = 1;
@@ -193,6 +199,9 @@
   }
 
   /* ---------- 6. Scroll animations (GSAP) ---------- */
+  // ScrollTriggers are made from the top of the page down, so the pinned
+  // spotlight is measured before everything below it.
+  let spotTrigger = null;   // the pinned spotlight (desktop only), used by the menu links
   if (animate) {
     /* Hero: headline word by word, then the rest fades up */
     const title = $('#heroTitle');
@@ -225,14 +234,15 @@
 
     /* Labels, prices and photos slide in when they reach the screen */
     const dist = phone ? 30 : 60;
-    $$('[data-anim]').forEach(el => {
+    const slideIn = el => {
       const from = { opacity: 0, duration: phone ? .6 : .9, ease: 'power3.out' };
       const dir = el.dataset.anim;
       if (dir === 'left') from.x = -dist;
       else if (dir === 'right') from.x = dist;
       else from.y = dist * .7;
       gsap.from(el, { ...from, scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
-    });
+    };
+    $$('#story [data-anim]').forEach(slideIn);   // the story sits above the spotlight
 
     /* "Since 2002": counts up from 1990 and glows once */
     const since = $('#sinceNum');
@@ -262,24 +272,28 @@
         defaults: { ease: 'power2.inOut' },
         scrollTrigger: {
           trigger: section, start: 'top top',
-          end: () => '+=' + Math.round(window.innerHeight * 5),
-          pin: '.spot-pin', scrub: 0.6, anticipatePin: 1, invalidateOnRefresh: true
+          end: () => '+=' + Math.round(window.innerHeight * 2.75),   // about one screen per dish
+          pin: '.spot-pin', scrub: 0.6, anticipatePin: 1, invalidateOnRefresh: true,
+          refreshPriority: 1   // measure the pin first, even if it is re-made after a resize
         }
       });
+      spotTrigger = tl.scrollTrigger;
       // Malai Boti: comes forward first, and stays the longest (biggest share of the scroll)
-      tl.fromTo(items[0], { scale: .86, y: 30 }, { scale: 1, y: 0, duration: 1.2 }, 0)
-        .fromTo($('.spot-text', items[0]), { x: 60, opacity: 0 }, { x: 0, opacity: 1, duration: 1.2 }, 0)
-        .to({}, { duration: 2.2 });                                     // hold
-      // Drumstick
-      tl.to(items[0], { autoAlpha: 0, scale: .9, y: -40, duration: 1 })
-        .fromTo(items[1], { autoAlpha: 0, scale: .86, y: 40 }, { autoAlpha: 1, scale: 1, y: 0, duration: 1 }, '<')
-        .to({}, { duration: 1.3 });
+      tl.fromTo(items[0], { scale: .86, y: 30 }, { scale: 1, y: 0, duration: .5 }, 0)
+        .fromTo($('.spot-text', items[0]), { x: 60, opacity: 0 }, { x: 0, opacity: 1, duration: .5 }, 0)
+        .addLabel('malai')                                               // fully on show here
+        .to({}, { duration: .55 });                                      // hold
+      // Drumstick: Malai Boti leaves completely, then the drumstick comes in
+      tl.to(items[0], { autoAlpha: 0, scale: .9, y: -40, duration: .35 })
+        .fromTo(items[1], { autoAlpha: 0, scale: .86, y: 40 }, { autoAlpha: 1, scale: 1, y: 0, duration: .35 })
+        .to({}, { duration: .55 });
       // Nablets
-      tl.to(items[1], { autoAlpha: 0, scale: .9, y: -40, duration: 1 })
-        .fromTo(items[2], { autoAlpha: 0, scale: .86, y: 40 }, { autoAlpha: 1, scale: 1, y: 0, duration: 1 }, '<')
-        .to({}, { duration: 1.3 });
+      tl.to(items[1], { autoAlpha: 0, scale: .9, y: -40, duration: .35 })
+        .fromTo(items[2], { autoAlpha: 0, scale: .86, y: 40 }, { autoAlpha: 1, scale: 1, y: 0, duration: .35 })
+        .to({}, { duration: .55 });
 
       return () => {
+        spotTrigger = null;
         section.classList.remove('pinned');
         gsap.set(items.concat($$('.spot-text', section)), { clearProps: 'all' });
       };
@@ -292,6 +306,9 @@
         });
       });
     });
+
+    // Everything below the spotlight
+    $$('[data-anim]').filter(el => !el.closest('#story')).forEach(slideIn);
   } else {
     // No animation: show the final text for "Since 2002" and keep the page plain.
     const since = $('#sinceNum');
@@ -327,7 +344,7 @@
   }
 
   DISHES.forEach(d => dishSelect.add(new Option(d.name, d.id)));
-  let scaleG = 250;
+  let scaleG = DISHES[0].basis;
   const readout = { g: 0, p: 0 };
   let scaleStarted = false;
 
@@ -347,10 +364,20 @@
       needle.setAttribute('transform', `rotate(${angle} 200 200)`);
     }
   }
+  // Show only the weights this dish is sold in, and light up the chosen one.
+  function syncWeightButtons(dish) {
+    const allowed = weightsFor(dish).map(w => w.g);
+    $$('#scaleWeights button').forEach(b => {
+      b.hidden = !allowed.includes(+b.dataset.w);
+      b.classList.toggle('on', +b.dataset.w === scaleG);
+    });
+  }
   function updateScale() {
     const dish = dishById(dishSelect.value);
     const targetP = priceFor(dish, scaleG);
-    $('#scaleImg').src = 'images/' + dish.img;
+    const img = $('#scaleImg');
+    img.width = dish.w; img.height = dish.h;
+    img.src = 'images/' + dish.img;
     setNeedle(angleFor(scaleG), true);
     if (hasGsap && !reduceMotion) {
       gsap.to(readout, { g: scaleG, p: targetP, duration: 1, ease: 'power2.out', onUpdate: renderReadout, overwrite: true });
@@ -367,7 +394,15 @@
     if (entries[0].isIntersecting) { scaleStarted = true; updateScale(); obs.disconnect(); }
   }, { threshold: .4 }).observe($('.scale-box'));
 
-  dishSelect.addEventListener('change', () => { scaleStarted = true; updateScale(); });
+  syncWeightButtons(DISHES[0]);
+  dishSelect.addEventListener('change', () => {
+    // each dish starts at its normal size (1 pao, half kg or 1 kg)
+    const dish = dishById(dishSelect.value);
+    scaleG = dish.basis;
+    syncWeightButtons(dish);
+    scaleStarted = true;
+    updateScale();
+  });
   $('#scaleWeights').addEventListener('click', e => {
     const b = e.target.closest('button');
     if (!b) return;
@@ -381,13 +416,13 @@
   const menuList = $('#menuList');
   menuList.innerHTML = DISHES.map(d => `
     <article class="menu-item">
-      <div class="thumb"><img src="images/${d.img}" alt="" loading="lazy"></div>
+      <div class="thumb"><img src="images/${d.img}" alt="" width="${d.w}" height="${d.h}" loading="lazy"></div>
       <div>
         <h4>${d.name}</h4>
         <p class="basis">${money(priceFor(d, d.basis))} ${BASIS_TEXT[d.basis]}</p>
         <div class="row">
           <select aria-label="Weight for ${d.name}" data-weight="${d.id}">
-            ${WEIGHTS.map(w => `<option value="${w.g}"${w.g === d.basis ? ' selected' : ''}>${w.short} · ${money(priceFor(d, w.g))}</option>`).join('')}
+            ${weightsFor(d).map(w => `<option value="${w.g}"${w.g === d.basis ? ' selected' : ''}>${w.short} · ${money(priceFor(d, w.g))}</option>`).join('')}
           </select>
           <button type="button" class="add-btn" data-add="${d.id}">Add</button>
         </div>
@@ -462,7 +497,8 @@
       const d = dishById(it.id);
       const line = priceFor(d, it.g) * it.qty;
       total += line;
-      return `- ${d.name}, ${weightByG(it.g).short} x ${it.qty} = ${money(line)}`;
+      // e.g. "- Malai Boti 500 g (2 x 1 pao) = Rs 700"
+      return `- ${d.name} ${gramsText(it.g * it.qty)} (${it.qty} x ${weightByG(it.g).short}) = ${money(line)}`;
     });
     const text = [
       'New order - BBQ Plus',
@@ -486,4 +522,78 @@
   new IntersectionObserver(entries => {
     waFloat.classList.toggle('hide', entries[0].isIntersecting);
   }).observe($('#order'));
+
+  /* ---------- 10. Phone menu (tap to open) ---------- */
+  const header = $('.site-header');
+  const menuBtn = $('#menuBtn');
+  const setMenu = open => {
+    header.classList.toggle('menu-open', open);
+    menuBtn.setAttribute('aria-expanded', open);
+    menuBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+  };
+  menuBtn.addEventListener('click', () => setMenu(!header.classList.contains('menu-open')));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
+  document.addEventListener('click', e => { if (!header.contains(e.target)) setMenu(false); });
+
+  /* ---------- 11. Menu links + starting in the right place ---------- */
+  // Where a #section really is, below the fixed header.
+  // The pinned spotlight lands where Malai Boti is fully on show.
+  function scrollPosFor(id) {
+    if (id === 'top' || id === 'hero') return 0;
+    if (id === 'spotlight' && spotTrigger) {
+      const tl = spotTrigger.animation;
+      return spotTrigger.start + (spotTrigger.end - spotTrigger.start) * tl.labels.malai / tl.duration();
+    }
+    const el = document.getElementById(id);
+    if (!el) return null;
+    return Math.max(0, el.getBoundingClientRect().top + window.scrollY - header.offsetHeight);
+  }
+  function goTo(id, smooth) {
+    const y = scrollPosFor(id);
+    if (y === null) return false;
+    window.scrollTo({ top: y, behavior: smooth && !reduceMotion ? 'smooth' : 'auto' });
+    return true;
+  }
+
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[href^="#"]');
+    const id = a && a.getAttribute('href').slice(1);
+    if (!id || !goTo(id, true)) return;
+    e.preventDefault();
+    setMenu(false);
+    history.pushState(null, '', '#' + id);
+  });
+
+  // The browser would jump to #section (or back to the old spot after a refresh)
+  // before fonts, images and the pinned spotlight are measured, and land in the
+  // wrong place. So we wait until everything has loaded, re-measure, then go there.
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  window.addEventListener('pagehide', () => {
+    try { sessionStorage.setItem('bbqScrollY', String(window.scrollY)); } catch (e) { /* storage blocked */ }
+  });
+  const pageLoaded = new Promise(r => {
+    if (document.readyState === 'complete') r();
+    else window.addEventListener('load', r, { once: true });
+  });
+  Promise.all([pageLoaded, document.fonts ? document.fonts.ready : null]).then(() => {
+    if (hasGsap) ScrollTrigger.refresh();
+    let savedY = null;
+    try { savedY = sessionStorage.getItem('bbqScrollY'); } catch (e) { /* storage blocked */ }
+    const nav = performance.getEntriesByType ? performance.getEntriesByType('navigation')[0] : null;
+    const cameBack = nav && (nav.type === 'reload' || nav.type === 'back_forward');
+    if (cameBack && savedY !== null) window.scrollTo({ top: +savedY, behavior: 'auto' });
+    else if (location.hash) goTo(location.hash.slice(1), false);
+  });
+
+  // Photos further down load only when they come close. They already have their
+  // size set, but re-measure once scrolling stops, just to be safe.
+  if (hasGsap) {
+    let imgLoaded = false;
+    $$('img[loading="lazy"]').forEach(img => {
+      if (!img.complete) img.addEventListener('load', () => { imgLoaded = true; }, { once: true });
+    });
+    ScrollTrigger.addEventListener('scrollEnd', () => {
+      if (imgLoaded) { imgLoaded = false; ScrollTrigger.refresh(); }
+    });
+  }
 })();

@@ -16,7 +16,7 @@
 <!-- ============ HEADER ============ -->
 <header class="site-header" id="top">
   <a class="brand" href="#top">BBQ <span>Plus</span></a>
-  <nav class="nav" aria-label="Main">
+  <nav class="nav" id="mainNav" aria-label="Main">
     <a href="#story">Story</a>
     <a href="#spotlight">Signature</a>
     <a href="#scale">Scale</a>
@@ -24,12 +24,13 @@
     <a href="#visit">Visit</a>
   </nav>
   <a class="btn btn-small" href="#order">Order</a>
+  <button type="button" class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="mainNav" aria-label="Open menu"><span></span></button>
 </header>
 
 <main>
 <!-- ============ HERO ============ -->
 <section class="hero" id="hero">
-  <div class="hero-bg"><img src="images/hero.jpg" alt="Charcoal grilled BBQ at BBQ Plus"></div>
+  <div class="hero-bg"><img src="images/hero.jpg" alt="Charcoal grilled BBQ at BBQ Plus" width="1920" height="1080"></div>
   <canvas class="sparks" id="sparks" aria-hidden="true"></canvas>
   <div class="hero-content">
     <p class="status-wrap"><span class="status" data-status><i></i><b>Checking…</b></span></p>
@@ -56,7 +57,7 @@
 <section class="section story" id="story">
   <div class="wrap story-grid">
     <div class="story-photo" data-anim="left">
-      <div class="zoom"><img src="images/story.jpg" alt="Fresh BBQ on the grill" loading="lazy"></div>
+      <div class="zoom"><img src="images/story.jpg" alt="Fresh BBQ on the grill" width="1400" height="2100" loading="lazy"></div>
     </div>
     <div class="story-text">
       <p class="eyebrow dark" data-anim="right">Our story</p>
@@ -88,7 +89,7 @@
       <article class="spot big" data-spot>
         <div class="plate-wrap">
           <canvas class="smoke" aria-hidden="true"></canvas>
-          <div class="plate"><img src="images/malai-boti.jpg" alt="Malai Boti on a plate"></div>
+          <div class="plate"><img src="images/malai-boti.jpg" alt="Malai Boti on a plate" width="1400" height="1050"></div>
         </div>
         <div class="spot-text">
           <span class="tag">Signature · Most famous</span>
@@ -102,7 +103,7 @@
       <article class="spot" data-spot>
         <div class="plate-wrap">
           <canvas class="smoke" aria-hidden="true"></canvas>
-          <div class="plate"><img src="images/drumstick.jpg" alt="Chicken drumsticks" loading="lazy"></div>
+          <div class="plate"><img src="images/drumstick.jpg" alt="Chicken drumsticks" width="1400" height="933" loading="lazy"></div>
         </div>
         <div class="spot-text">
           <span class="tag">Charcoal favourite</span>
@@ -116,7 +117,7 @@
       <article class="spot" data-spot>
         <div class="plate-wrap">
           <canvas class="smoke" aria-hidden="true"></canvas>
-          <div class="plate"><img src="images/nablets.jpg" alt="Nablets" loading="lazy"></div>
+          <div class="plate"><img src="images/nablets.jpg" alt="Nablets" width="1400" height="933" loading="lazy"></div>
         </div>
         <div class="spot-text">
           <span class="tag">Fan favourite</span>
@@ -138,7 +139,7 @@
     <h2 class="section-title" data-anim="right">Also on the <em>coals</em></h2>
     <div class="cards">
       <article class="card" data-anim="up">
-        <div class="zoom"><img src="images/chicken-tikka.jpg" alt="Chicken Thai Tikka" loading="lazy"></div>
+        <div class="zoom"><img src="images/chicken-tikka.jpg" alt="Chicken Thai Tikka" width="1400" height="933" loading="lazy"></div>
         <div class="card-body">
           <h3>Chicken Thai Tikka</h3>
           <p class="muted">Thigh pieces, full of flavour.</p>
@@ -146,7 +147,7 @@
         </div>
       </article>
       <article class="card" data-anim="up">
-        <div class="zoom"><img src="images/chicken-kabab.jpg" alt="Chicken Kabab" loading="lazy"></div>
+        <div class="zoom"><img src="images/chicken-kabab.jpg" alt="Chicken Kabab" width="1400" height="933" loading="lazy"></div>
         <div class="card-body">
           <h3>Chicken Kabab</h3>
           <p class="muted">Soft, spiced and smoky.</p>
@@ -154,7 +155,7 @@
         </div>
       </article>
       <article class="card" data-anim="up">
-        <div class="zoom"><img src="images/grill-fish.jpg" alt="Grilled fish" loading="lazy"></div>
+        <div class="zoom"><img src="images/grill-fish.jpg" alt="Grilled fish" width="1400" height="933" loading="lazy"></div>
         <div class="card-body">
           <h3>Grilled Fish <span class="chip">Winter only</span></h3>
           <p class="muted">Seasonal. Available in the winter months.</p>
@@ -207,7 +208,7 @@
           <circle cx="200" cy="200" r="16" fill="#ff6a1a"/>
           <circle cx="200" cy="200" r="6" fill="#161412"/>
         </svg>
-        <div class="dial-dish"><img id="scaleImg" src="images/malai-boti.jpg" alt=""></div>
+        <div class="dial-dish"><img id="scaleImg" src="images/malai-boti.jpg" alt="" width="1400" height="1050"></div>
       </div>
     </div>
   </div>
@@ -242,6 +243,7 @@
           <label><input type="radio" name="mode" value="Pickup" checked> Pickup</label>
           <label><input type="radio" name="mode" value="Delivery"> Delivery</label>
         </fieldset>
+        <p class="tiny delivery-note">Delivery charges are confirmed on WhatsApp.</p>
 
         <label class="field" for="custName">Your name</label>
         <input id="custName" type="text" autocomplete="name" placeholder="e.g. Ali">
