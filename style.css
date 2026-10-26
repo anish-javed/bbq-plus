@@ -157,37 +157,30 @@ button, select, input, textarea { font: inherit; }
 .spotlight { background: radial-gradient(ellipse at 50% 30%, #2d241d, var(--char) 70%); padding: 72px 0; }
 .spot-head { text-align: center; padding: 0 20px 30px; }
 .spot-head h2 { font-size: clamp(2rem, 6vw, 3.4rem); font-weight: 800; margin: 0; }
-.spot-stage { width: min(1120px, 100% - 40px); margin-inline: auto; display: grid; gap: 64px; }
-.spot { display: grid; gap: 22px; align-items: center; }
-.plate-wrap { position: relative; width: min(82%, 380px); margin-inline: auto; }
-.spot.big .plate-wrap { width: min(100%, 460px); }
+.spot-stage { width: min(1120px, 100% - 40px); margin-inline: auto; display: grid; gap: 28px; }
+.spot {
+  display: flex; flex-direction: column; gap: 22px;
+  background: var(--char-3); border-radius: var(--radius); border: 1px solid rgba(246, 236, 217, .08);
+  padding: 120px 22px 28px;   /* the space on top is where the smoke rises */
+}
+.plate-wrap { position: relative; width: min(100%, 300px); margin-inline: auto; }
 .plate {
   aspect-ratio: 1; border-radius: 50%; overflow: hidden;
   border: 10px solid #eadcc2; outline: 2px solid rgba(0, 0, 0, .25);
   box-shadow: 0 30px 60px rgba(0, 0, 0, .55), 0 0 90px rgba(255, 106, 26, .22), inset 0 0 0 4px rgba(0, 0, 0, .15);
 }
 .plate img { width: 100%; height: 100%; object-fit: cover; }
-.smoke { position: absolute; left: -10%; top: -50%; width: 120%; height: 100%; pointer-events: none; z-index: 2; }
-.spot-text { text-align: center; }
+/* Smoke sits just above the plate. It is wider and taller than the wisps, so they fade out before they could touch an edge. */
+.smoke { position: absolute; left: -30%; top: -70%; width: 160%; height: 80%; pointer-events: none; z-index: 2; }
+.spot-text { text-align: center; flex: 1; display: flex; flex-direction: column; align-items: center; }
+.spot-text .btn { margin-top: auto; }
 .tag { display: inline-block; font-size: .75rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--ember); border: 1px solid rgba(255, 106, 26, .55); padding: 5px 12px; border-radius: 999px; margin-bottom: 14px; }
-.spot-text h3 { font-size: clamp(2rem, 8vw, 3.2rem); font-weight: 800; }
-.spot.big .spot-text h3 { font-size: clamp(2.5rem, 10vw, 4.4rem); }
+.spot-text h3 { font-size: clamp(1.8rem, 7vw, 2.3rem); font-weight: 800; }
 .spot-text p { color: #d9ccb6; max-width: 44ch; margin-inline: auto; }
 
 .price { font-family: var(--serif); font-weight: 800; font-size: 1.9rem; color: var(--ember-2); margin: 0 0 18px !important; }
 .price small { font-family: var(--sans); font-weight: 500; font-size: .9rem; color: #c9b99f; margin-left: 4px; }
 .price.small { font-size: 1.35rem; margin-bottom: 0 !important; }
-
-/* Desktop pinned layout (class added by JS only when it will animate) */
-.spotlight.pinned { padding: 0; }
-.spotlight.pinned .spot-pin { height: 100vh; display: flex; flex-direction: column; justify-content: center; padding-top: 70px; }
-.spotlight.pinned .spot-head { padding-bottom: 0; }
-.spotlight.pinned .spot-stage { position: relative; display: block; height: 66vh; width: min(1120px, 100% - 40px); }
-.spotlight.pinned .spot { position: absolute; inset: 0; grid-template-columns: 1.05fr 1fr; gap: 56px; }
-.spotlight.pinned .plate-wrap { width: min(100%, 52vh); margin-inline: auto; }
-.spotlight.pinned .spot.big .plate-wrap { width: min(100%, 62vh); }
-.spotlight.pinned .spot-text { text-align: left; }
-.spotlight.pinned .spot-text p { margin-inline: 0; }
 
 /* ===== Cards ===== */
 .dark-soft { background: var(--char-2); }
@@ -337,9 +330,10 @@ button, select, input, textarea { font: inherit; }
   .order-grid { grid-template-columns: 1.15fr 1fr; gap: 36px; }
   .order-box { position: sticky; top: 84px; }
   .visit-grid { grid-template-columns: 1fr 1.2fr; gap: 56px; }
-  .spotlight:not(.pinned) .spot { grid-template-columns: 1fr 1fr; }
-  .spotlight:not(.pinned) .spot-text { text-align: left; }
-  .spotlight:not(.pinned) .spot-text p { margin-inline: 0; }
+  .spotlight { padding: 110px 0; }
+  .spot-stage { grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .spot { padding-inline: 18px; }
+  .spot-text h3 { font-size: clamp(1.45rem, 2.4vw, 2.1rem); }
   .wa-float { width: auto; height: auto; padding: 13px 22px 13px 16px; border-radius: 999px; gap: 10px; right: 24px; bottom: 24px; }
   .wa-float span { display: inline; font-weight: 700; font-size: .95rem; }
   .footer { padding-bottom: 110px; }
@@ -369,8 +363,9 @@ button, select, input, textarea { font: inherit; }
   .menu-open .nav {
     display: flex; flex-direction: column; gap: 0;
     position: absolute; top: 100%; left: 0; right: 0; padding: 4px 20px 12px;
-    background: rgba(22, 20, 18, .97); border-bottom: 2px solid var(--ember);
+    background: var(--char); border-bottom: 2px solid var(--ember);
   }
+  .menu-open.site-header { background: var(--char); backdrop-filter: none; -webkit-backdrop-filter: none; }
   .menu-open .nav a { padding: 13px 0; font-size: 1.05rem; opacity: 1; border-bottom: 1px solid rgba(246, 236, 217, .1); }
   .menu-open .nav a:last-child { border-bottom: 0; }
 

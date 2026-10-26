@@ -150,35 +150,36 @@
     });
   }
 
-  /* ---------- 5b. Smoke over the spotlight dishes ---------- */
+  /* ---------- 5b. Smoke over the signature dishes ---------- */
+  // Soft wisps rise from the top of each plate. Every wisp is a blurry blob that
+  // fades to nothing, and it also fades out before it could reach the edge of the
+  // canvas, so no box or straight edge is ever visible.
   const spots = $$('[data-spot]');
   if (!reduceMotion) {
-    const puff = makeSprite(96, [[0, 'rgba(236,232,226,.9)'], [0.5, 'rgba(236,232,226,.35)'], [1, 'rgba(236,232,226,0)']]);
+    const puff = makeSprite(96, [[0, 'rgba(236,232,226,.8)'], [0.35, 'rgba(236,232,226,.4)'], [0.7, 'rgba(236,232,226,.1)'], [1, 'rgba(236,232,226,0)']]);
+    const clamp01 = v => Math.max(0, Math.min(1, v));
     spots.forEach(spot => {
       const canvas = $('.smoke', spot);
       const ctx = canvas.getContext('2d');
       let size = fitCanvas(canvas);
-      let phoneSize = isPhone();   // phones keep the lighter smoke; desktop gets a bit more
+      let phoneSize = isPhone();   // phones get slightly lighter smoke
       const puffs = [];
       let timer = 0;
       window.addEventListener('resize', () => { size = fitCanvas(canvas); phoneSize = isPhone(); });
 
       runWhileVisible(canvas, dt => {
-        // In the pinned layout, only the dish at the front makes smoke.
-        const front = !spot.closest('.pinned') || gsap.getProperty(spot, 'opacity') > 0.3;
         timer -= dt;
-        if (front && timer <= 0) {
-          timer = phoneSize ? 0.55 : 0.22;
+        if (timer <= 0) {
+          timer = phoneSize ? 0.5 : 0.35;
+          const max = 5 + Math.random() * 2;
           puffs.push({
-            x: size.w * (0.5 + (Math.random() - 0.5) * 0.3),
-            y: size.h * 0.98,
-            r: size.w * (phoneSize ? 0.07 + Math.random() * 0.05 : 0.08 + Math.random() * 0.06),
-            vy: size.h * (0.12 + Math.random() * 0.08),
-            grow: 1.1 + Math.random() * 0.7,
-            sway: size.w * (0.02 + Math.random() * 0.04),
+            x: size.w * (0.5 + (Math.random() - 0.5) * 0.28),
+            y: size.h * 0.86,                                   // the top edge of the plate
+            r: size.w * (0.035 + Math.random() * 0.02),
+            vy: size.h * 0.36 / max,                            // rises about a third of the canvas
+            sway: size.w * (0.02 + Math.random() * 0.03),
             phase: Math.random() * 6.28,
-            life: 0,
-            max: 4.5 + Math.random() * 2
+            life: 0, max
           });
         }
         ctx.clearRect(0, 0, size.w, size.h);
@@ -188,10 +189,13 @@
           const t = p.life / p.max;
           if (t >= 1) { puffs.splice(i, 1); continue; }
           p.y -= p.vy * dt;
-          const r = p.r * (1 + t * 2.4 * p.grow);
+          const r = p.r * (1 + t * 0.9);
+          const ry = r * 1.5;                                   // a little taller than wide, like a wisp
           const x = p.x + Math.sin(p.life * 0.9 + p.phase) * p.sway * (0.4 + t);
-          ctx.globalAlpha = Math.sin(Math.PI * t) * (phoneSize ? 0.24 : 0.36);   // see-through: rises, then melts away
-          ctx.drawImage(puff, x - r, p.y - r, r * 2, r * 2);
+          // fade in, rise, melt away; and fade early if a wisp ever got near an edge
+          const edge = clamp01(Math.min(p.y - ry, x - r, size.w - x - r) / (size.h * 0.12));
+          ctx.globalAlpha = Math.sin(Math.PI * t) * (phoneSize ? 0.16 : 0.2) * edge;
+          ctx.drawImage(puff, x - r, p.y - ry, r * 2, ry * 2);
         }
         ctx.globalAlpha = 1;
       });
@@ -199,9 +203,6 @@
   }
 
   /* ---------- 6. Scroll animations (GSAP) ---------- */
-  // ScrollTriggers are made from the top of the page down, so the pinned
-  // spotlight is measured before everything below it.
-  let spotTrigger = null;   // the pinned spotlight (desktop only), used by the menu links
   if (animate) {
     /* Hero: headline word by word, then the rest fades up */
     const title = $('#heroTitle');
@@ -242,7 +243,7 @@
       else from.y = dist * .7;
       gsap.from(el, { ...from, scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
     };
-    $$('#story [data-anim]').forEach(slideIn);   // the story sits above the spotlight
+    $$('[data-anim]').forEach(slideIn);
 
     /* "Since 2002": counts up from 1990 and glows once */
     const since = $('#sinceNum');
@@ -260,55 +261,15 @@
       }
     });
 
-    /* Spotlight: pinned on desktop, simple fade-ins on phones */
-    const mm = gsap.matchMedia();
-    mm.add('(min-width: 768px)', () => {
-      const section = $('#spotlight');
-      section.classList.add('pinned');
-      const items = $$('[data-spot]', section);
-      gsap.set(items.slice(1), { autoAlpha: 0 });
-
-      const tl = gsap.timeline({
-        defaults: { ease: 'power2.inOut' },
-        scrollTrigger: {
-          trigger: section, start: 'top top',
-          end: () => '+=' + Math.round(window.innerHeight * 2.75),   // about one screen per dish
-          pin: '.spot-pin', scrub: 0.6, anticipatePin: 1, invalidateOnRefresh: true,
-          refreshPriority: 1   // measure the pin first, even if it is re-made after a resize
-        }
-      });
-      spotTrigger = tl.scrollTrigger;
-      // Malai Boti: comes forward first, and stays the longest (biggest share of the scroll)
-      tl.fromTo(items[0], { scale: .86, y: 30 }, { scale: 1, y: 0, duration: .5 }, 0)
-        .fromTo($('.spot-text', items[0]), { x: 60, opacity: 0 }, { x: 0, opacity: 1, duration: .5 }, 0)
-        .addLabel('malai')                                               // fully on show here
-        .to({}, { duration: .55 });                                      // hold
-      // Drumstick: Malai Boti leaves completely, then the drumstick comes in
-      tl.to(items[0], { autoAlpha: 0, scale: .9, y: -40, duration: .35 })
-        .fromTo(items[1], { autoAlpha: 0, scale: .86, y: 40 }, { autoAlpha: 1, scale: 1, y: 0, duration: .35 })
-        .to({}, { duration: .55 });
-      // Nablets
-      tl.to(items[1], { autoAlpha: 0, scale: .9, y: -40, duration: .35 })
-        .fromTo(items[2], { autoAlpha: 0, scale: .86, y: 40 }, { autoAlpha: 1, scale: 1, y: 0, duration: .35 })
-        .to({}, { duration: .55 });
-
-      return () => {
-        spotTrigger = null;
-        section.classList.remove('pinned');
-        gsap.set(items.concat($$('.spot-text', section)), { clearProps: 'all' });
-      };
-    });
-    mm.add('(max-width: 767px)', () => {
-      $$('[data-spot]').forEach(spot => {
-        gsap.from(spot, {
-          y: 40, opacity: 0, duration: .7, ease: 'power2.out',
-          scrollTrigger: { trigger: spot, start: 'top 85%', once: true }
-        });
+    /* Signature dishes: the cards fade and rise in one after another, once.
+       On a computer they share a row, so each waits a little for the one before it.
+       On a phone they are stacked, so each one plays as it reaches the screen. */
+    $$('[data-spot]').forEach((spot, i) => {
+      gsap.from(spot, {
+        y: 40, opacity: 0, duration: .8, ease: 'power2.out', delay: phone ? 0 : i * .2,
+        scrollTrigger: { trigger: spot, start: 'top 88%', once: true }
       });
     });
-
-    // Everything below the spotlight
-    $$('[data-anim]').filter(el => !el.closest('#story')).forEach(slideIn);
   } else {
     // No animation: show the final text for "Since 2002" and keep the page plain.
     const since = $('#sinceNum');
@@ -537,13 +498,8 @@
 
   /* ---------- 11. Menu links + starting in the right place ---------- */
   // Where a #section really is, below the fixed header.
-  // The pinned spotlight lands where Malai Boti is fully on show.
   function scrollPosFor(id) {
     if (id === 'top' || id === 'hero') return 0;
-    if (id === 'spotlight' && spotTrigger) {
-      const tl = spotTrigger.animation;
-      return spotTrigger.start + (spotTrigger.end - spotTrigger.start) * tl.labels.malai / tl.duration();
-    }
     const el = document.getElementById(id);
     if (!el) return null;
     return Math.max(0, el.getBoundingClientRect().top + window.scrollY - header.offsetHeight);
@@ -565,8 +521,7 @@
   });
 
   // The browser would jump to #section (or back to the old spot after a refresh)
-  // before fonts, images and the pinned spotlight are measured, and land in the
-  // wrong place. So we wait until everything has loaded, re-measure, then go there.
+  // before fonts and images are measured, and land in the wrong place. So we wait until everything has loaded, re-measure, then go there.
   if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
   window.addEventListener('pagehide', () => {
     try { sessionStorage.setItem('bbqScrollY', String(window.scrollY)); } catch (e) { /* storage blocked */ }
